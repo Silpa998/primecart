@@ -11,7 +11,7 @@ class ExploreProductsController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = Product::with(['category', 'variations'])->get();
         $categories = Category::all();
 
         return view('Explore-more.index', compact('products', 'categories'));  

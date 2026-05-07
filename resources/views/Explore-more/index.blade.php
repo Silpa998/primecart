@@ -145,17 +145,19 @@
 
         <p class="text-2xl font-black text-slate-900 mb-5">₹<span x-text="product.price.toLocaleString()"></span></p>
 
-        <div class="grid grid-cols-2 gap-3">
+  {{--  <div class="grid grid-cols-2 gap-3">
             <button @click="addToCart(product)" class="flex items-center justify-center gap-2 py-3 px-4 bg-slate-100 text-slate-900 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 Add
-            </button>
-            <a :href="'/checkout/single/' + product.id" class="py-3 px-4 bg-primary text-white text-center rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-secondary transition-all active:scale-95">
-                Checkout
+            </button>   
+            <a :href="product.hasVariation
+                    ? '/checkout/single/' + product.variation_id
+                    : '/checkout/product/' + product.id" class="py-3 px-4 bg-primary text-white text-center rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 hover:bg-secondary transition-all active:scale-95">
+                    Checkout
             </a>
-        </div>
+        </div> --}}
     </div>
 </template>
                 </div>
@@ -177,16 +179,32 @@ function productFilter() {
         wishlist: JSON.parse(localStorage.getItem('wishlist') || '[]'),
         cart: Object.values(@json(session()->get('cart', []))),
 
-        // Product data mapping (Backend data to Frontend format)
-        products: @json($products).map(p => ({
-            id: p.id,
-            name: p.product_name,
-            category: p.category?.category_name || 'Uncategorized',
-            price: p.price,
-            image: p.image ? `/storage/${p.image}` : '/images/placeholder.jpg'
-        })),
+        // Product data mapping (Fixed Syntax)
+        products: @json($products).map(p => {
+            // Variation undo ennu check cheyyunnu
+            const hasVariation = p.variations && p.variations.length > 0;
+            const variation = hasVariation ? p.variations[0] : null;
 
-        // --- 2. Computed Properties (Auto-filtering) ---
+            // Oro product-inum ee structure return cheyyunnu
+            return {
+                id: p.id,
+                variation_id: variation ? variation.id : null,
+                name: p.product_name,
+                category: p.category?.category_name || 'Uncategorized',
+                
+                // Variation price or main price
+                price: variation ? variation.price : p.price,
+
+                // Variation image or main image
+                image: (variation && variation.image) 
+                    ? `/storage/${variation.image}` 
+                    : (p.image ? `/storage/${p.image}` : '/images/placeholder.jpg'),
+
+                hasVariation: hasVariation
+            };
+        }),
+
+        // --- 2. Computed Properties ---
         get filteredProducts() {
             const searchTerm = this.search.toLowerCase();
             return this.products.filter(p => {
@@ -247,7 +265,6 @@ function productFilter() {
 
                 if (!response.ok) throw new Error('Cart sync failed');
 
-                // Update local UI state
                 const existingItem = this.cart.find(item => item.id === product.id);
                 if (existingItem) {
                     existingItem.quantity++;
@@ -256,9 +273,6 @@ function productFilter() {
                 }
 
                 this.syncCart();
-                // Optional: Oru cheriya toast notification kaanikkunnath nallathayirikkum
-                console.log(`${product.name} added to cart`);
-
             } catch (error) {
                 console.error("Cart Error:", error);
                 alert("can't add items to the cart.");
