@@ -33,7 +33,7 @@ class ExploreProductsController extends Controller
         } else {
             $cart[$id] = [
                 "id" => $product->id,
-                "name" => $product->product_name, // DB column 'product_name' aayirikkaam, check it!
+                "name" => $product->product_name, 
                 "quantity" => 1,
                 "price" => $product->price,
                 "image" => $product->image ? $product->image : 'placeholder.jpg'

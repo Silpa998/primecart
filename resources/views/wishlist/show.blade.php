@@ -32,7 +32,6 @@
             
 
 
-
             <div x-data="{ 
     isLiked: {{ $isWishlisted ? 'true' : 'false' }},
     async toggleWishlist() {

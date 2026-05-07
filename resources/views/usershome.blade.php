@@ -155,7 +155,7 @@
                 <div class="absolute inset-0 bg-emerald-500/10 blur-[120px] rounded-full transform translate-x-12"></div>
                 <div class="relative bg-white p-4 rounded-[40px] shadow-2xl border border-white rotate-3 hover:rotate-0 transition-transform duration-700">
                     <div class="bg-slate-100 w-full h-[400px] rounded-[30px] flex items-center justify-center text-slate-300">
-                        <img src="{{ asset('storage/products/Online.jpg') }}" alt="Hero Image" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/products/Online.jpg') }}" alt="Hero Image" class="w-full h-full object-cover">                    
                     </div>
                 </div>
             </div>
@@ -163,6 +163,7 @@
     </section>
 
     <section class="py-24 bg-slate-50/50">
+        
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
                 <div class="text-left">
@@ -190,8 +191,7 @@
 
                             {{-- Action Icons --}}
                             <div class="absolute top-5 right-5 z-10 flex flex-col gap-2">
-                                <button @click="addToWishlist({{ $product->id }})" 
-                                        class="p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm hover:bg-white"
+                            <button @click="addToWishlist({{ $product->id }}, {{ $product->variations->first()?->id ?? 'null' }})"                                        class="p-2 bg-white/80 backdrop-blur-sm rounded-full transition-colors shadow-sm hover:bg-white"
                                         :class="wishlistedProducts.includes({{ $product->id }}) ? 'text-red-500 bg-red-50' : 'text-slate-400'">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :fill="wishlistedProducts.includes({{ $product->id }}) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -308,7 +308,7 @@
             Alpine.data('wishlistApp', () => ({
                 wishlistedProducts: {!! Auth::check() ? Auth::user()->wishlists->pluck('product_id')->toJson() : '[]' !!},
                 isLoggedIn: {{ Auth::check() ? 'true' : 'false' }},
-                async addToWishlist(productId) {
+                async addToWishlist(productId, variationId = null) {
                     if (!this.isLoggedIn) {
                         window.location.href = "{{ route('login') }}";
                         return;
@@ -319,7 +319,10 @@
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            }
+                            },
+                            body: JSON.stringify({
+                                variation_id: variationId
+                            })
                         });
                         if (!response.ok) throw new Error('Request failed');
                         const data = await response.json();

@@ -21,7 +21,7 @@
             background-image: radial-gradient(at 0% 0%, rgba(78, 166, 133, 0.05) 0px, transparent 50%), 
                               radial-gradient(at 100% 100%, rgba(87, 184, 148, 0.05) 0px, transparent 50%);
         }
-    </style>
+    </style> 
 </head>
 <body class="bg-mesh text-slate-900 selection:bg-primary selection:text-white">
 
@@ -355,33 +355,53 @@
                                 </button>
                             </form>
 
-                            <button 
-                                x-data="{ 
-                                    liked: {{ (auth()->check() && auth()->user()->wishlist && auth()->user()->wishlist->contains('product_id', $product->id)) ? 'true' : 'false' }},
-                                    async toggle() {
-                                        @if(!auth()->check()) window.location.href = '{{ route('login') }}'; return; @endif
-                                        try {
-                                            let response = await fetch('{{ route('wishlist.toggle', $product->id) }}', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                                                    'Content-Type': 'application/json',
-                                                    'Accept': 'application/json'
-                                                }
-                                            });
-                                            let data = await response.json();
-                                            this.liked = (data.status === 'added');
-                                        } catch (error) { console.error('Error:', error); }
-                                    }
-                                }" 
-                                @click="toggle()"
-                                :class="liked ? 'border-red-500 bg-red-50' : 'border-slate-100 hover:border-primary'"
-                                class="col-span-1 flex items-center justify-center border-2 rounded-3xl transition-all duration-300 group active:scale-95"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" :class="liked ? 'text-red-500 fill-red-500' : 'text-slate-300 group-hover:text-red-500'" class="h-6 w-6 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                            </button>
+                            <!-- Wishlist Button - scope 'main' tag-il ulla 'selectedVariationId' upayogikkunnu -->
+<button 
+    x-data="{ 
+        liked: {{ (auth()->check() && auth()->user()->wishlist && auth()->user()->wishlist->contains('product_id', $product->id)) ? 'true' : 'false' }},
+        
+        async toggle() {
+            @if(!auth()->check()) 
+                window.location.href = '{{ route('login') }}'; 
+                return; 
+            @endif
+
+            try {
+                // Main scope-il ulla selectedVariationId ivide kittiye pattu
+                let vId = this.selectedVariationId; 
+
+                let response = await fetch('{{ route('wishlist.toggle', $product->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Direct CSRF token ivide nalkunnu
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        variation_id: vId // Selected variation id ayaykkunnu
+                    })
+                });
+
+                if (response.ok) {
+                    let data = await response.json();
+                    this.liked = (data.status === 'added');
+                }
+            } catch (error) { 
+                console.error('Error:', error); 
+            }
+        }
+    }" 
+    @click="toggle()"
+    :class="liked ? 'border-red-500 bg-red-50' : 'border-slate-100 hover:border-primary'"
+    class="col-span-1 flex items-center justify-center border-2 rounded-3xl transition-all duration-300 group active:scale-95"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         :class="liked ? 'text-red-500 fill-red-500' : 'text-slate-300 group-hover:text-red-500'" 
+         class="h-6 w-6 transition-all duration-300" 
+         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+</button>
                         </div>
                     </div>
                 </div>

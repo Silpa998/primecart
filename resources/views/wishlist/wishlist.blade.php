@@ -135,65 +135,88 @@
                 </div>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+
+
                     @foreach($wishlistItems as $item)
-                        @php $product = $item->product; @endphp
-                        
-                        <div x-data="{ removed: false }" 
-                             x-show="!removed" 
-                             x-transition:leave="transition ease-in duration-300"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             class="group relative bg-white rounded-[32px] overflow-hidden border border-slate-100 p-5 shadow-sm transition-all hover:shadow-xl hover:shadow-emerald-100/50 hover:-translate-y-1">
-                            
-                            <button @click="
-                                fetch('{{ route('wishlist.toggle', $product->id) }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Content-Type': 'application/json'
-                                    }
-                                })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if(data.status === 'removed') {
-                                        removed = true; 
-                                        $dispatch('wishlist-updated', { message: 'Item removed from wishlist' });
-                                    }
-                                })"
-                                class="absolute top-5 right-5 z-20 p-2.5 bg-white/90 backdrop-blur-md rounded-full text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm border border-slate-100 active:scale-90">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                </svg>
-                            </button>
+    @php 
+        $variation = $item->variation;
+        $baseProduct = $item->product;
+    @endphp
 
-                            <a href="{{ route('wishlist.show', $product->id) }}" class="block group">
-                                <div class="product-image w-full h-48 bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden transition-transform duration-500">
-                                    @if($product->image)
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->product_name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                                    @else
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    @endif
-                                </div>
-                            </a>
+    @if($baseProduct)
+        <div x-data="{ removed: false }" 
+             x-show="!removed" 
+             x-transition:leave="transition ease-in duration-300"
+             class="group relative bg-white rounded-[32px] overflow-hidden border border-slate-100 p-5 shadow-sm transition-all hover:shadow-xl">
+            
+            {{-- Logic to decide ID, Image, and Price --}}
+            @php
+                $displayId = $variation ? $variation->id : $baseProduct->id;
+                $displayName = $baseProduct->product_name;
+                $displayImage = ($variation && $variation->image) ? $variation->image : $baseProduct->image;
+                $displayPrice = ($variation && $variation->price) ? $variation->price : $baseProduct->price;
+            @endphp
 
-                            <div class="space-y-1 mb-6">
-                                <h3 class="text-lg font-black text-slate-900 truncate">{{ $product->product_name }}</h3>
-                                <p class="text-2xl font-black text-slate-900">₹{{ number_format($product->price) }}</p>
-                            </div>
+            {{-- Wishlist Toggle Button --}}
+            <button @click="
+                    fetch('{{ route('wishlist.toggle', $baseProduct->id) }}?variation_id={{ $item->product_variation_id }}', {                    
+                        method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'removed') {
+                        removed = true; 
+                        $dispatch('wishlist-updated', { message: 'Item removed from wishlist' });
+                    }
+                })"
+                class="absolute top-5 right-5 z-20 p-2.5 bg-white/90 backdrop-blur-md rounded-full text-red-500 hover:bg-red-500 hover:text-white shadow-sm border border-slate-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+            </button>
 
-                            <form action="{{ route('wishlist.move', $item->product_id) }}" method="POST" class="w-full">
-                               @csrf
-                               <button type="submit" class="w-full group flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-primary transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                    </svg>
-                                        Move to Cart
-                                </button>
-                            </form>
+            {{-- Product Image Section --}}
+            <a href="{{ route('wishlist.show', $baseProduct->id) }}" class="block group">
+                <div class="product-image w-full h-48 bg-slate-50 rounded-2xl flex items-center justify-center overflow-hidden">
+                    @if($displayImage)
+                        <img src="{{ asset('storage/' . $displayImage) }}" alt="{{ $displayName }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    @else
+                        <div class="text-slate-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                         </div>
-                    @endforeach
+                    @endif
+                </div>
+            </a>
+
+            {{-- Details Section --}}
+            <div class="mt-4 mb-6">
+                <h3 class="text-lg font-black text-slate-900 truncate">{{ $displayName }}</h3>
+                @if($variation)
+                    <p class="text-xs text-emerald-600 font-bold uppercase tracking-wider">{{ $variation->variant }} ({{ $variation->color }})</p>
+                @endif
+                <p class="text-2xl font-black text-slate-900 mt-1">₹{{ number_format($displayPrice) }}</p>
+            </div>
+
+            {{-- Move to Cart Form --}}
+            <form action="{{ route('wishlist.move', $baseProduct->id) }}" method="POST" class="w-full">
+               @csrf
+               <!--send Variation ID hidden field as hidden file -->
+               <input type="hidden" name="variation_id" value="{{ $item->product_variation_id }}">
+               
+               <button type="submit" class="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-primary transition-all">
+                    Move to Cart
+                </button>
+            </form>
+        </div>
+    @endif
+@endforeach
+
+
+
                 </div>
             @endif
         </div>
