@@ -97,7 +97,7 @@ class UserController extends Controller
     // Check if the 'User' role exists, otherwise create it
     $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'User']);
     $user->assignRole($role);
-    }
+    } 
 
     // 5. Redirect
     if (Auth::check() && Auth::user()->type == 1) {

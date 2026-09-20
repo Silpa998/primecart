@@ -60,10 +60,23 @@
                     <span>Products</span>
                 </a>
 
-                 <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'sidebar-active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-emerald-50 hover:text-[#4EA685] transition-all">
+                <a href="{{route('product-variations.index')}}" class="{{ request()->routeIs('product-variations.*') ? 'sidebar-active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-emerald-50 hover:text-[#4EA685] transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                    </svg>
+                    <span>Product Variations</span>
+                </a>
+
+                <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'sidebar-active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-emerald-50 hover:text-[#4EA685] transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 11h.01M7 15h.01M13 7h.01M13 11h.01M13 15h.01M17 7h.01M17 11h.01M17 15h.01M3 21h18M3 7a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" /></svg>
                     <span>Categories</span>
+                </a>
 
+                <a href="{{ route('variations.index' )}}" class=" flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-emerald-50 hover:text-[#4EA685] transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Variations</span>
                 </a>
 
                 <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'sidebar-active' : '' }} flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-emerald-50 hover:text-[#4EA685] transition-all">
@@ -98,7 +111,7 @@
                             <p class="text-[10px] text-gray-400 truncate">admin@shop.pro</p>
                         </div>
                     </div>
-                    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
                     <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="p-2 text-gray-400 hover:text-[#4EA685] transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     </button>

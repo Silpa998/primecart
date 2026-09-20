@@ -19,7 +19,8 @@
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <img src="{{ asset('storage/' . ($product->image ?? $product->variations->whereNotNull('image')->first()?->image)) }}" 
-                        class="h-12 w-12 object-cover rounded">                </td>
+                        class="h-12 w-12 object-cover rounded">                
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                     {{ $product->product_name }}
                 </td>
@@ -27,7 +28,7 @@
                     {{ $product->category->category_name ?? 'No Category' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                    ${{ number_format($product->price, 2) }}
+                    ₹{{ number_format($product->price, 2) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     @if($product->stock <= 5)

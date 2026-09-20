@@ -80,24 +80,7 @@ class AdminAuthController extends Controller
         return  back()->withErrors(['Invalid credentials'])->withInput();
 
     }
-    //     if (Auth::attempt($credentials)) {
-    //         $request->session()->regenerate();
-        
-    //         if (Auth::user()->type == 1) {
-    //             return redirect()->route('admin.dashboard');
-    //         }
-
-    //     else if (Auth::user()->type == 0) {
-    //         return view('usershome');
-    //     }
-    // }
-
-    // return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
-   
     
-
-  
-
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();

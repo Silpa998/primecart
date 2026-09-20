@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
   
 class Product extends Model
 {
@@ -16,14 +17,15 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'product_name', 'category_id', 'price', 'stock', 'image', 
+        'product_name', 'category_id', 'price', 'stock', 'image', 'status'
     ];
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
-    public function variations()
+    
+    public function variations() : HasMany
     { 
         // if product_id is the foreign key in product_variations table, we can omit it as Laravel will automatically use the convention
         return $this->hasMany(ProductVariation::class, 'product_id');

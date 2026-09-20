@@ -58,6 +58,8 @@
         border-bottom: 1px solid #f1f5f9;
         color: #334155;
         font-size: 0.9rem;
+        /* വേരിയേഷൻ കൂടുമ്പോൾ മറ്റ് കോളങ്ങൾ നടുവിലായി നിൽക്കാൻ ഇത് സഹായിക്കുന്നു */
+        vertical-align: middle; 
     }
     .category-table tr:hover {
         background-color: #fcfdfe;
@@ -70,12 +72,58 @@
         font-family: monospace;
         font-size: 0.8rem;
     }
+    .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+    .badge-danger {
+        background: #fee2e2;
+        color: #dc2626;
+    }
     .action-links {
         display: flex;
-        gap: 10px;
+        gap: 12px;
+        /* ബട്ടണുകൾ എപ്പോഴും ഒരേ ലൈനിൽ വരാൻ വേണ്ടി */
+        align-items: center; 
+        white-space: nowrap; 
     }
-    .edit-link { color: #4EA685; text-decoration: none; font-weight: 600; }
-    .delete-link { color: #ef4444; text-decoration: none; font-weight: 600; }
+    .edit-link { 
+        color: #4EA685; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+    .delete-btn {
+        background: none; 
+        border: none; 
+        color: #ef4444; 
+        cursor: pointer; 
+        padding: 0; 
+        font-family: inherit; 
+        font-weight: 600;
+    }
+    .variation-list {
+        margin: 0; 
+        padding-left: 15px;
+    }
+    .no-data {
+        text-align: center; 
+        padding: 40px; 
+        color: #94a3b8;
+    }
+    .alert-success {
+        padding: 12px; 
+        background: #dcfce7; 
+        color: #166534; 
+        border-radius: 10px; 
+        margin-bottom: 20px; 
+        font-size: 0.875rem;
+    }
 </style>
 
 <div class="index-container">
@@ -85,11 +133,10 @@
             <p style="color: #64748b; font-size: 0.875rem; margin-top: 4px;">Manage your store's product groupings.</p>
         </div>
         <a href="{{ route('categories.create') }}" class="btn-create">+ New Category</a>
-        
     </div>
 
     @if(session('success'))
-        <div style="padding: 12px; background: #dcfce7; color: #166534; border-radius: 10px; margin-bottom: 20px; font-size: 0.875rem;">
+        <div class="alert-success">
             {{ session('success') }}
         </div>
     @endif
@@ -97,31 +144,51 @@
     <table class="category-table">
         <thead>
             <tr>
-                {{-- <th>ID</th> --}}
                 <th>Category Name</th>
                 <th>Slug</th>
                 <th>Description</th>
+                <th>Available Variations</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @forelse($categories as $category)
                 <tr>
-                    {{-- <td>#{{ $category->id }}</td> --}}
                     <td style="font-weight: 700;">{{ $category->category_name }}</td>
                     <td><span class="badge-slug">{{ $category->slug }}</span></td>
                     <td style="color: #64748b;">{{ Str::limit($category->description, 50) }}</td>
-                    <td class="action-links">
-                        <a href="{{ route('categories.edit', $category->id) }}" class="edit-link">Edit</a>
-                        <form action="{{ route('categories.destroy', $category->id)}}" method="POST" style="display:inline;">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="delete-link" style="background:none; border:none; cursor:pointer; padding:0; font-family:inherit;">Delete</button>
-                        </form>
+                    <td>
+                        @if($category->available_variations && count($category->available_variations) > 0)
+                            <ul class="variation-list">
+                                @foreach($category->variation_names as $variation_name)
+                                    <li>{{ $variation_name }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p style="color: #94a3b8; margin: 0;">No variations assigned.</p>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="badge {{ $category->status == 1 ? 'badge-success' : 'badge-danger' }}">
+                            {{ $category->status == 1 ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-links">
+                            <a href="{{ route('categories.edit', $category->id) }}" class="edit-link">Edit</a>
+                            
+                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                @csrf 
+                                @method('DELETE')
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">
+                    <td colspan="6" class="no-data">
                         No categories found. Start by adding one!
                     </td>
                 </tr>

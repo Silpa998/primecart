@@ -47,30 +47,6 @@ class AddToCartController extends Controller
 
     }
 
-    // public function cart()
-    // {
-    //     if (Auth::check()) {
-    //         $userId = Auth::id();
-    //         $cartItems = Cart::where('user_id', $userId)->with('product')->get();
-    //     } else {
-    //        // get data from tempcart for unauthenticated users
-    //         $cartItems = session()->get('temp_cart', []);
-    //     }
-    //     return view('addtocart.cart', compact('cartItems'));
-    // }
-    // {
-    //      logged in, get cart items from database
-    //     if (auth()->check()) {
-    //         $cartItems = \App\Models\Cart::with('product')
-    //                     ->where('user_id', auth()->id())
-    //                     ->get();
-    //     } else {
-    //     do not login, then get cart items from session
-    //         $cartItems = session()->get('temp_cart', []);
-    //     }
-    // return view('addtocart.cart', compact('cartItems'));
-    // }
-
     public function addToCart(Request $request, $productId)
     {
         $product = Product::with('category')->findOrFail($productId);
@@ -100,46 +76,16 @@ class AddToCartController extends Controller
                 ->withInput();
         }    
 
-
-
-        // declaring logic
-
-        // dd($categoryName);
-
         $sizeToStore = ($categoryName === 'Clothings') ? $inputSize : null;
 
         $variantToStore = ($categoryName === 'Mobile') ? $inputVariant : null;
 
-
-
-        // if ($categoryName === 'Clothings') {
-
-        //     $sizeToStore = $inputSize;
-
-        // } elseif ($categoryName === 'Mobile') {
-
-        //     $variantToStore = $inputVariant;
-
-        // } else {
-
-        //     $sizeToStore    = $inputSize;
-
-        //     $variantToStore = $inputVariant;
-
-        // }
-
-
-
         if (!Auth::check()) {
 
             //store cart data in session for non-logged in users
-
             $cart = session()->get('temp_cart', []);
 
-
-
             // create a unique key for the cart item based on product and variation          
-
             $cartKey = $productId . '-' . ($variationId ?? '0') . '-' . ($sizeToStore ?? 'none') . '-' . ($color ?? 'none');            
 
            
@@ -233,66 +179,6 @@ class AddToCartController extends Controller
             return redirect()->back()->with('success', 'Product added to cart successfully!');
 
         }
-
-
-
-
-
-    // public function addToCart(Request $request, $id)
-
-    // {
-
-    // if (Auth::check()) {
-
-    //     $userId = Auth::id();
-
-    //     $product = Product::findOrFail($id);
-
-
-
-    //     // 1. Check if this product already exists in the user's database cart
-
-    //     $cartItem = Cart::where('user_id', $userId)
-
-    //                     ->where('product_id', $id)
-
-    //                     ->first();
-
-
-
-    //     if ($cartItem) {
-
-    //         // Update quantity if it exists
-
-    //         $cartItem->increment('quantity');
-
-    //     } else {
-
-    //         // Create a new database record if it doesn't
-
-    //         Cart::create([
-
-    //             'user_id'    => $userId,
-
-    //             'product_id' => $id,
-
-    //             'quantity'   => 1,
-
-    //         ]);
-
-    //     }
-
-
-
-    //     return redirect()->back()->with('success', 'Product added successfully!');
-
-    // }
-
-
-
-    // }
-
-
 
     public function update(Request $request)
 

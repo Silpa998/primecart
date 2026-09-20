@@ -155,7 +155,7 @@
                 <div class="absolute inset-0 bg-emerald-500/10 blur-[120px] rounded-full transform translate-x-12"></div>
                 <div class="relative bg-white p-4 rounded-[40px] shadow-2xl border border-white rotate-3 hover:rotate-0 transition-transform duration-700">
                     <div class="bg-slate-100 w-full h-[400px] rounded-[30px] flex items-center justify-center text-slate-300">
-                        <img src="{{ asset('storage/products/Online.jpg') }}" alt="Hero Image" class="w-full h-full object-cover">                    
+                        <img src="{{ asset('images/Online.jpg') }}" alt="Hero Image" class="w-full h-full object-cover">                    
                     </div>
                 </div>
             </div>
