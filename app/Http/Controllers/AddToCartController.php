@@ -29,15 +29,12 @@ class AddToCartController extends Controller
     {
 
         if (Auth::check()) {
-            // Logged in user: Database-il ninnu edukkaam
             $cartItems = Cart::where('user_id', Auth::id())
                 ->with(['product.category', 'variation'])
                 ->latest()
                 ->get();
         } else {
-            // Guest user: Session-il ninnu array aayi edukkaam
             $cartItems = session()->get('temp_cart', []);
-
             $cartItems = array_reverse($cartItems);
         }
 
